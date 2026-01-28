@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>公司電子布告欄</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            width: 1920px; height: 1080px;
+            /* 確保背景圖檔名完全一致 */
+            background: url('background.png') no-repeat center center;
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* L1: 左側公告文字區 */
+        #L1_Text { position: absolute; top: 250px; left: 30px; width: 800px; height: 620px; font-size: 32px; color: #333; line-height: 1.6; }
+
+        /* R2: 時間日期區 */
+        #R2_Time { position: absolute; top: 245px; left: 880px; width: 510px; font-size: 45px; font-weight: bold; text-align: center; color: #333; }
+
+        /* R3: 天氣小工具 (寬度設為 329px) */
+        #R3_Weather { position: absolute; top: 245px; left: 1420px; width: 329px; }
+
+        /* R4: 圖片/影片輪播區 */
+        #R4_Carousel { position: absolute; top: 560px; left: 880px; width: 1010px; height: 350px; background-color: #fff; display: flex; align-items: center; justify-content: center; }
+        #slideImg { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* D1: 下方跑馬燈文字 */
+        #D1_Marquee { position: absolute; bottom: 25px; left: 0; width: 1920px; height: 80px; font-size: 36px; color: white; display: flex; align-items: center; }
+        marquee { width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="L1_Text">正在讀取最新公告...</div>
+
+    <div id="R2_Time">載入時間...</div>
+
+    <div id="R3_Weather">
+        <a class="weatherwidget-io" href="https://forecast7.com/en/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN CITY" data-label_2="WEATHER" data-theme="original" >TAOYUAN CITY WEATHER</a>
+        <script>
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        </script>
+    </div>
+
+    <div id="R4_Carousel">
+        <img id="slideImg" src="" alt="輪播圖片">
+    </div>
+
+    <div id="D1_Marquee">
+        <marquee id="tickerText" scrollamount="10">歡迎光臨永冠興業股份有限公司！</marquee>
+    </div>
+
+    <script>
+        // 1. 每秒更新時間
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }) + 
+                            ' ' + now.toLocaleTimeString('zh-TW', { hour12: false });
+            document.getElementById('R2_Time').innerText = timeStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 2. Google Sheets 資料串接
+        // 請將下方連結換成你在步驟一得到的 CSV 發佈網址
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2uPxWEdBPH7D6GCv7xhaxQtbcoSCzK4hTiXQdP2iV5d-NsZDEdmNVojTP5MQMyRlKWLOmP87kr5kr/pub?output=csv";
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+                // 這裡後續可以根據你的 CSV 結構加入更複雜的解析邏輯
+                console.log("成功抓取資料");
+            } catch (error) {
+                console.error("抓取資料時發生錯誤:", error);
+            }
+        }
+
+        // 啟動時執行一次，之後每1小時自動重新整理網頁獲取最新資料
+        updateDashboard();
+        setTimeout(() => { location.reload(); }, 3600000); 
+    </script>
+</body>
+</html>
