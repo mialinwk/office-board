@@ -2,96 +2,124 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>公司電子布告欄</title>
+    <title>TATE 公司電子布告欄</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        body {
-            margin: 0; padding: 0;
-            width: 1920px; height: 1080px;
-            background: url('background.png') no-repeat center center;
-            background-size: 1920px 1080px;
-            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
+        body { margin: 0; width: 1920px; height: 1080px; background: url('background.png') no-repeat; font-family: "Microsoft JhengHei"; overflow: hidden; position: relative; }
+        
+        /* L1 樣式 */
+        #L1_Container { position: absolute; top: 380px; left: 40px; width: 780px; height: 580px; overflow: hidden; }
+        .L1_Title { font-size: 40px; font-weight: bold; color: #004080; margin-bottom: 10px; border-bottom: 2px solid #004080; }
+        .L1_Content { font-size: 32px; line-height: 1.6; }
+        .L1_Image { width: 100%; height: 450px; object-fit: contain; }
 
-        /* L1: 左側公告文字區 (調整了位置與間距) */
-        #L1_Text { position: absolute; top: 380px; left: 40px; width: 780px; height: 580px; font-size: 36px; color: #333; line-height: 1.8; padding: 20px; box-sizing: border-box; }
+        /* R2 時間 */
+        #R2_Time { position: absolute; top: 350px; left: 480px; width: 440px; text-align: center; }
+        .date-str { font-size: 32px; font-weight: bold; }
+        .time-str { font-size: 60px; font-weight: 900; color: #0056b3; }
 
-        /* R2: 時間日期區 (美化版) */
-        #R2_Time { position: absolute; top: 350px; left: 480px; width: 440px; text-align: center; color: #1a1a1a; }
-        .date-str { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
-        .time-str { font-size: 64px; font-weight: 900; color: #0056b3; }
+        /* R4 媒體 */
+        #R4_Container { position: absolute; top: 680px; left: 475px; width: 1420px; height: 280px; background: #000; }
+        .media-item { width: 100%; height: 100%; object-fit: contain; }
 
-        /* R3: 天氣小工具 (向下移動避免重疊) */
-        #R3_Weather { position: absolute; top: 345px; left: 1410px; width: 329px; }
-
-        /* R4: 輪播區 (修正對齊框線) */
-        #R4_Carousel { position: absolute; top: 680px; left: 475px; width: 1420px; height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #slideImg { width: 100%; height: 100%; object-fit: contain; }
-
-        /* D1: 跑馬燈 (文字垂直置中) */
-        #D1_Marquee { position: absolute; bottom: 10px; left: 0; width: 1920px; height: 80px; font-size: 40px; color: white; display: flex; align-items: center; }
+        /* D1 跑馬燈 */
+        #D1_Box { position: absolute; bottom: 10px; width: 1920px; height: 80px; color: white; font-size: 40px; display: flex; align-items: center; }
     </style>
 </head>
 <body>
 
-    <div id="L1_Text">正在讀取最新公告...</div>
-
+    <div id="L1_Container"><div id="L1_Content">載入中...</div></div>
+    
     <div id="R2_Time">
-        <div id="dateStr" class="date-str">2026/01/28 星期三</div>
-        <div id="timeStr" class="time-str">16:13:39</div>
+        <div id="dateStr" class="date-str"></div>
+        <div id="timeStr" class="time-str"></div>
     </div>
 
     <div id="R3_Weather">
-        <a class="weatherwidget-io" href="https://forecast7.com/en/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN CITY" data-label_2="WEATHER" data-theme="original" >TAOYUAN CITY WEATHER</a>
+        <a class="weatherwidget-io" href="https://forecast7.com/en/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN CITY" data-theme="original" >TAOYUAN</a>
     </div>
 
-    <div id="R4_Carousel">
-        <img id="slideImg" src="" style="display:none;">
-    </div>
+    <div id="R4_Container"></div>
 
-    <div id="D1_Marquee">
-        <marquee id="tickerText" scrollamount="12">歡迎使用永冠興業電子公告欄系統...</marquee>
-    </div>
+    <div id="D1_Box"><marquee id="tickerText" scrollamount="12"></marquee></div>
 
     <script>
-        // 1. 美化版時間顯示 (R2)
+        // --- 請在此替換您的三個 CSV 網址 ---
+        const L1_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2uPxWEdBPH7D6GCv7xhaxQtbcoSCzK4hTiXQdP2iV5d-NsZDEdmNVojTP5MQMyRlKWLOmP87kr5kr/pub?gid=0&single=true&output=csv";
+        const R4_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2uPxWEdBPH7D6GCv7xhaxQtbcoSCzK4hTiXQdP2iV5d-NsZDEdmNVojTP5MQMyRlKWLOmP87kr5kr/pub?gid=1252696765&single=true&output=csv";
+        const D1_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2uPxWEdBPH7D6GCv7xhaxQtbcoSCzK4hTiXQdP2iV5d-NsZDEdmNVojTP5MQMyRlKWLOmP87kr5kr/pub?gid=1988370572&single=true&output=csv";
+
+        // 更新時間
         function updateTime() {
             const now = new Date();
             const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const dStr = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${days[now.getDay()]}`;
-            const tStr = now.toLocaleTimeString('zh-TW', { hour12: false });
-            document.getElementById('dateStr').innerText = dStr;
-            document.getElementById('timeStr').innerText = tStr;
+            document.getElementById('dateStr').innerText = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${days[now.getDay()]}`;
+            document.getElementById('timeStr').innerText = now.toLocaleTimeString('zh-TW', { hour12: false });
         }
         setInterval(updateTime, 1000);
-        updateTime();
 
-        // 2. Google Sheets 資料讀取邏輯
-        const sheetUrl = "在這裡貼上你的CSV網址"; // <--- 請務必換成你的網址
-
-        async function loadData() {
-            if (sheetUrl.includes("在這裡貼上")) return;
-            try {
-                const response = await fetch(sheetUrl);
-                const data = await response.text();
-                const rows = data.split('\n').map(row => row.split(','));
-
-                // 假設你的 Sheet 格式：第一列是標題，內容在第二列以後
-                // 這裡需要根據你的表格欄位調整 index [0][1] 等
-                if(rows.length > 1) {
-                    // 更新 D1 跑馬燈 (假設在第一分頁的第一列)
-                    // document.getElementById('tickerText').innerText = rows[1][0]; 
-                }
-            } catch (e) { console.error("資料讀取失敗"); }
+        // 日期判斷邏輯
+        function isCurrent(start, end) {
+            const now = new Date();
+            const s = new Date(start);
+            const e = new Date(end);
+            e.setHours(23, 59, 59); // 結束日包含當天
+            return now >= s && now <= e;
         }
-        loadData();
 
-        // 天氣腳本
+        // 讀取 L1 公告輪播
+        async function initL1() {
+            Papa.parse(L1_CSV, { download: true, header: true, complete: function(results) {
+                const activeData = results.data.filter(d => d.顯示 === 'TRUE' && isCurrent(d.開始日, d.結束日));
+                let idx = 0;
+                function rotate() {
+                    if (activeData.length === 0) return;
+                    const item = activeData[idx];
+                    let html = `<div class="L1_Title">${item.標題}</div>`;
+                    if (item.類型 === 'image') html += `<img src="${item['內容圖片連結']}" class="L1_Image">`;
+                    else html += `<div class="L1_Content">${item['內容圖片連結']}</div>`;
+                    document.getElementById('L1_Container').innerHTML = html;
+                    idx = (idx + 1) % activeData.length;
+                }
+                rotate();
+                setInterval(rotate, 10000); // 10秒輪播
+            }});
+        }
+
+        // 讀取 R4 媒體輪播
+        async function initR4() {
+            Papa.parse(R4_CSV, { download: true, header: true, complete: function(results) {
+                const activeData = results.data.filter(d => d.顯示 === 'TRUE');
+                let idx = 0;
+                function rotate() {
+                    if (activeData.length === 0) return;
+                    const item = activeData[idx];
+                    const container = document.getElementById('R4_Container');
+                    if (item.類型 === 'video') {
+                        container.innerHTML = `<video src="${item.連結}" autoplay muted class="media-item" id="vdo"></video>`;
+                        document.getElementById('vdo').onended = rotate; // 影片播完自動下一則
+                    } else {
+                        container.innerHTML = `<img src="${item.連結}" class="media-item">`;
+                        setTimeout(rotate, item.播放秒數 * 1000); // 依設定秒數輪播
+                    }
+                    idx = (idx + 1) % activeData.length;
+                }
+                rotate();
+            }});
+        }
+
+        // 讀取 D1 跑馬燈
+        async function initD1() {
+            Papa.parse(D1_CSV, { download: true, header: true, complete: function(results) {
+                const texts = results.data
+                    .filter(d => d.顯示 === 'TRUE' && isCurrent(d.開始日, d.結束日))
+                    .map(d => d.文字);
+                document.getElementById('tickerText').innerText = texts.join(" ｜ ");
+            }});
+        }
+
+        initL1(); initR4(); initD1();
         !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-        
-        // 每一小時自動整理
-        setTimeout(() => { location.reload(); }, 3600000);
     </script>
 </body>
 </html>
