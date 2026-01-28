@@ -7,81 +7,91 @@
         body {
             margin: 0; padding: 0;
             width: 1920px; height: 1080px;
-            /* 確保背景圖檔名完全一致 */
             background: url('background.png') no-repeat center center;
+            background-size: 1920px 1080px;
             font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
             overflow: hidden;
             position: relative;
         }
 
-        /* L1: 左側公告文字區 */
-        #L1_Text { position: absolute; top: 250px; left: 30px; width: 800px; height: 620px; font-size: 32px; color: #333; line-height: 1.6; }
+        /* L1: 左側公告文字區 (調整了位置與間距) */
+        #L1_Text { position: absolute; top: 380px; left: 40px; width: 780px; height: 580px; font-size: 36px; color: #333; line-height: 1.8; padding: 20px; box-sizing: border-box; }
 
-        /* R2: 時間日期區 */
-        #R2_Time { position: absolute; top: 245px; left: 880px; width: 510px; font-size: 45px; font-weight: bold; text-align: center; color: #333; }
+        /* R2: 時間日期區 (美化版) */
+        #R2_Time { position: absolute; top: 350px; left: 480px; width: 440px; text-align: center; color: #1a1a1a; }
+        .date-str { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
+        .time-str { font-size: 64px; font-weight: 900; color: #0056b3; }
 
-        /* R3: 天氣小工具 (寬度設為 329px) */
-        #R3_Weather { position: absolute; top: 245px; left: 1420px; width: 329px; }
+        /* R3: 天氣小工具 (向下移動避免重疊) */
+        #R3_Weather { position: absolute; top: 345px; left: 1410px; width: 329px; }
 
-        /* R4: 圖片/影片輪播區 */
-        #R4_Carousel { position: absolute; top: 560px; left: 880px; width: 1010px; height: 350px; background-color: #fff; display: flex; align-items: center; justify-content: center; }
-        #slideImg { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* R4: 輪播區 (修正對齊框線) */
+        #R4_Carousel { position: absolute; top: 680px; left: 475px; width: 1420px; height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        #slideImg { width: 100%; height: 100%; object-fit: contain; }
 
-        /* D1: 下方跑馬燈文字 */
-        #D1_Marquee { position: absolute; bottom: 25px; left: 0; width: 1920px; height: 80px; font-size: 36px; color: white; display: flex; align-items: center; }
-        marquee { width: 100%; }
+        /* D1: 跑馬燈 (文字垂直置中) */
+        #D1_Marquee { position: absolute; bottom: 10px; left: 0; width: 1920px; height: 80px; font-size: 40px; color: white; display: flex; align-items: center; }
     </style>
 </head>
 <body>
 
     <div id="L1_Text">正在讀取最新公告...</div>
 
-    <div id="R2_Time">載入時間...</div>
+    <div id="R2_Time">
+        <div id="dateStr" class="date-str">2026/01/28 星期三</div>
+        <div id="timeStr" class="time-str">16:13:39</div>
+    </div>
 
     <div id="R3_Weather">
         <a class="weatherwidget-io" href="https://forecast7.com/en/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN CITY" data-label_2="WEATHER" data-theme="original" >TAOYUAN CITY WEATHER</a>
-        <script>
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-        </script>
     </div>
 
     <div id="R4_Carousel">
-        <img id="slideImg" src="" alt="輪播圖片">
+        <img id="slideImg" src="" style="display:none;">
     </div>
 
     <div id="D1_Marquee">
-        <marquee id="tickerText" scrollamount="10">歡迎光臨永冠興業股份有限公司！</marquee>
+        <marquee id="tickerText" scrollamount="12">歡迎使用永冠興業電子公告欄系統...</marquee>
     </div>
 
     <script>
-        // 1. 每秒更新時間
+        // 1. 美化版時間顯示 (R2)
         function updateTime() {
             const now = new Date();
-            const timeStr = now.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }) + 
-                            ' ' + now.toLocaleTimeString('zh-TW', { hour12: false });
-            document.getElementById('R2_Time').innerText = timeStr;
+            const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const dStr = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${days[now.getDay()]}`;
+            const tStr = now.toLocaleTimeString('zh-TW', { hour12: false });
+            document.getElementById('dateStr').innerText = dStr;
+            document.getElementById('timeStr').innerText = tStr;
         }
         setInterval(updateTime, 1000);
         updateTime();
 
-        // 2. Google Sheets 資料串接
-        // 請將下方連結換成你在步驟一得到的 CSV 發佈網址
-        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2uPxWEdBPH7D6GCv7xhaxQtbcoSCzK4hTiXQdP2iV5d-NsZDEdmNVojTP5MQMyRlKWLOmP87kr5kr/pub?output=csv";
+        // 2. Google Sheets 資料讀取邏輯
+        const sheetUrl = "在這裡貼上你的CSV網址"; // <--- 請務必換成你的網址
 
-        async function updateDashboard() {
+        async function loadData() {
+            if (sheetUrl.includes("在這裡貼上")) return;
             try {
                 const response = await fetch(sheetUrl);
                 const data = await response.text();
-                // 這裡後續可以根據你的 CSV 結構加入更複雜的解析邏輯
-                console.log("成功抓取資料");
-            } catch (error) {
-                console.error("抓取資料時發生錯誤:", error);
-            }
-        }
+                const rows = data.split('\n').map(row => row.split(','));
 
-        // 啟動時執行一次，之後每1小時自動重新整理網頁獲取最新資料
-        updateDashboard();
-        setTimeout(() => { location.reload(); }, 3600000); 
+                // 假設你的 Sheet 格式：第一列是標題，內容在第二列以後
+                // 這裡需要根據你的表格欄位調整 index [0][1] 等
+                if(rows.length > 1) {
+                    // 更新 D1 跑馬燈 (假設在第一分頁的第一列)
+                    // document.getElementById('tickerText').innerText = rows[1][0]; 
+                }
+            } catch (e) { console.error("資料讀取失敗"); }
+        }
+        loadData();
+
+        // 天氣腳本
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        
+        // 每一小時自動整理
+        setTimeout(() => { location.reload(); }, 3600000);
     </script>
 </body>
 </html>
