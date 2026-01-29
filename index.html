@@ -120,7 +120,12 @@
                 document.getElementById('tickerText').innerText = texts.join(" ｜ ");
             }});
         }
-
+// 天氣小工具載入
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        
+        // 每小時自動刷新頁面獲取最新內容
+        setTimeout(() => { location.reload(); }, 3600000);
+        
         initL1(); initR4(); initD1();
         !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
     </script>
