@@ -5,7 +5,15 @@
     <title>TATE 公司電子布告欄</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        body { margin: 0; width: 1920px; height: 1080px; background: url('background.png') no-repeat; font-family: "Microsoft JhengHei"; overflow: hidden; position: relative; }
+        body {
+    margin: 0;
+    padding: 0;
+    width: 100vw; /* 使用視窗寬度 */
+    height: 100vh; /* 使用視窗高度 */
+    background: url('background.png') no-repeat center center;
+    background-size: cover; /* 關鍵：自動縮放以填滿螢幕 */
+    overflow: hidden;
+}
         
         /* L1 樣式 */
         #L1_Container { position: absolute; top: 380px; left: 40px; width: 780px; height: 580px; overflow: hidden; }
