@@ -16,25 +16,40 @@
 }
         
         /* L1 樣式 */
-        #L1_Container { position: absolute; top: 380px; left: 40px; width: 780px; height: 580px; overflow: hidden; }
+        #L1_Container { position: absolute; top: 360px; left: 60px; width: 780px; height: 580px; overflow: hidden; }
         .L1_Title { font-size: 40px; font-weight: bold; color: #004080; margin-bottom: 10px; border-bottom: 2px solid #004080; }
         .L1_Content { font-size: 32px; line-height: 1.6; }
         .L1_Image { width: 100%; height: 450px; object-fit: contain; }
 
         /* R2 時間 */
-        #R2_Time { position: absolute; top: 350px; left: 480px; width: 440px; text-align: center; }
+        #R2_Time { position: absolute; top: 360px; left: 480px; width: 910px; text-align: center; }
         .date-str { font-size: 32px; font-weight: bold; }
         .time-str { font-size: 60px; font-weight: 900; color: #0056b3; }
 
         /* R3: 天氣小工具 */
-        #R3_Weather { position: absolute; top: 245px; left: 1420px; width: 329px; }
+        #R3_Weather { position: absolute; top: 360px; left: 1420px; width: 329px; }
       
         /* R4 媒體 */
-        #R4_Container { position: absolute; top: 680px; left: 475px; width: 1420px; height: 280px; background: #000; }
+        #R4_Container { position: absolute; top: 650px; left: 480px; width: 910px; height: 280px; background: #000; }
         .media-item { width: 100%; height: 100%; object-fit: contain; }
 
-        /* D1 跑馬燈 */
-        #D1_Box { position: absolute; bottom: 10px; width: 1920px; height: 80px; color: white; font-size: 40px; display: flex; align-items: center; }
+        /* D1 跑馬燈：修正位置與寬度 */
+#D1_Box { 
+    position: absolute; 
+    bottom: 25px;           /* 增加數值，讓文字往上移動到藍條中央 */
+    left: 40px;             /* 關鍵：向右偏移，對齊藍條的起點 */
+    width: 1840px;          /* 縮小寬度（1920 - 40 - 40），讓文字在藍條末端才消失 */
+    height: 60px; 
+    color: white; 
+    font-size: 38px;        /* 稍微縮小字體，確保不會壓到框線 */
+    display: flex; 
+    align-items: center; 
+    overflow: hidden;       /* 確保文字不會超出此範圍 */
+}
+
+marquee {
+    width: 100%;
+}
     </style>
 </head>
 <body>
