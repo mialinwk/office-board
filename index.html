@@ -5,52 +5,57 @@
     <title>TATE 公司電子布告欄</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        body {
-    margin: 0;
-    padding: 0;
-    width: 100vw; /* 使用視窗寬度 */
-    height: 100vh; /* 使用視窗高度 */
-    background: url('background.png') no-repeat center center;
-    background-size: cover; /* 關鍵：自動縮放以填滿螢幕 */
-    overflow: hidden;
-}
-        
-        /* L1 樣式 */
-        #L1_Container { position: absolute; top: 360px; left: 60px; width: 780px; height: 580px; overflow: hidden; }
-        .L1_Title { font-size: 40px; font-weight: bold; color: #004080; margin-bottom: 10px; border-bottom: 2px solid #004080; }
-        .L1_Content { font-size: 32px; line-height: 1.6; }
-        .L1_Image { width: 100%; height: 450px; object-fit: contain; }
+    body {
+        margin: 0; padding: 0;
+        width: 100vw; height: 100vh;
+        background: url('background.png') no-repeat center center;
+        background-size: 100% 100%; /* 強制背景與視窗完全同步縮放 */
+        overflow: hidden;
+        position: relative;
+    }
 
-        /* R2 時間 */
-        #R2_Time { position: absolute; top: 360px; left: 480px; width: 910px; text-align: center; }
-        .date-str { font-size: 32px; font-weight: bold; }
-        .time-str { font-size: 60px; font-weight: 900; color: #0056b3; }
+    /* L1 公告區 */
+    #L1_Container {
+        position: absolute;
+        top: 35.5%; left: 2.2%; width: 42%; height: 54%;
+        font-size: 2vw; /* 字體隨寬度縮放 */
+        padding: 1%;
+        box-sizing: border-box;
+    }
 
-        /* R3: 天氣小工具 */
-        #R3_Weather { position: absolute; top: 250px; left: 1420px; width: 329px; }
-      
-        /* R4 媒體 */
-        #R4_Container { position: absolute; top: 650px; left: 480px; width: 910px; height: 280px; background: #000; }
-        .media-item { width: 100%; height: 100%; object-fit: contain; }
+    /* R2 時間區 */
+    #R2_Time {
+        position: absolute;
+        top: 34.5%; left: 47.5%; width: 25.5%;
+        text-align: center;
+    }
+    .date-str { font-size: 1.8vw; font-weight: bold; }
+    .time-str { font-size: 3.5vw; font-weight: 900; color: #0056b3; }
 
-        /* D1 跑馬燈：修正位置與寬度 */
-#D1_Box { 
-    position: absolute; 
-    bottom: 25px;           /* 增加數值，讓文字往上移動到藍條中央 */
-    left: 40px;             /* 關鍵：向右偏移，對齊藍條的起點 */
-    width: 1840px;          /* 縮小寬度（1920 - 40 - 40），讓文字在藍條末端才消失 */
-    height: 60px; 
-    color: white; 
-    font-size: 38px;        /* 稍微縮小字體，確保不會壓到框線 */
-    display: flex; 
-    align-items: center; 
-    overflow: hidden;       /* 確保文字不會超出此範圍 */
-}
+    /* R3 天氣區 */
+    #R3_Weather {
+        position: absolute;
+        top: 34.5%; left: 74.5%; width: 23%;
+    }
 
-marquee {
-    width: 100%;
-}
-    </style>
+    /* R4 媒體區 */
+    #R4_Container {
+        position: absolute;
+        top: 66.5%; left: 47.5%; width: 50.5%; height: 28%;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+    }
+
+    /* D1 跑馬燈區 */
+    #D1_Box {
+        position: absolute;
+        top: 92.5%; left: 2.2%; width: 95.6%;
+        height: 5.5%;
+        display: flex; align-items: center;
+        color: white;
+        font-size: 2vw;
+    }
+</style>
 </head>
 <body>
 
